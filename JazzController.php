@@ -242,335 +242,76 @@ public function status_inquire(Request $request)
     public function redirect(){
         return 'hello';
     }
-    ////
-    // public function initiatePayment(Request $request)
-    // {
-    // //    dd($request->all());
-    //     try {
-    //         // Validate input
-    //         $validated = $request->validate([
-    //             'product_id' => 'required|integer',
-    //             'amount' => 'required|numeric',
-    //             'source_site_url' => 'required|url',
-    //             'duration' => 'required|string',
-    //             'email' => 'required|email',
-    //             'name' => 'required|string',
-                
-    //         ]);
-
-    //         $course = null;
-
-    //         // Check if type is 1 or plan_id is not null
-    //        if ($request->input('type') == 1 || !is_null($request->input('product_id'))) {
-    //             // Save data to the 'courses' table
-    //             $course = Course::updateOrCreate(
-    //                 ['plan_id' => $validated['product_id']],
-    //                 [
-    //                     'course_name' => 'Product ' . $validated['product_id'],
-    //                     'description' => 'Payment for product ' . $validated['product_id'],
-    //                     'type' => 1,
-    //                     'source_site' => $validated['source_site_url'],
-    //                     'advisor' => 'System',
-    //                     'level' => 'Beginner',
-    //                     'duration' => $validated['duration'],
-    //                 ]
-    //             );
-    //         //    dd(  $course);
-          
-    //             // Store email and name in the 'registration' table
-    //        Registration::create([
-    //                 'email' => $validated['email'],
-    //                 'name' => $validated['name'],
-    //                 'payment_method'=>'card',
-    //                 'status'=>'incomplete',
-
-    //             ]);
-    //   // Redirect to the frontend checkout form with auto-filled email and name
-    //             return view('Frontend.checkin', [
-    //                 'email' => $validated['email'],
-    //                 'name' => $validated['name'],
-                     
-    //             ]);
-    //        }
-
-    //         // Generate transaction reference
-    //         $txnRef = 'TXN' . $validated['product_id'] . time();
-
-    //         // Create payment record
-    //         $payment = PackagePayment::create([
-    //             'transaction_id' => $txnRef,
-    //             'product_id' => $validated['product_id'],
-    //             'amount' => $validated['amount'],
-    //             'status' => 'pending',
-    //             'return_url' => url('/jazzcash/callback?source=' . urlencode($validated['source_site_url'])),
-    //             'jazzcash_response' => null,
-    //         ]);
-
-    //         // Verify JazzCash credentials
-    //         // $merchantId = config('services.jazzcash.merchant_id');
-    //         // $password = config('services.jazzcash.password');
-    //         // $hashKey = config('services.jazzcash.hash_key');
-    //         // $paymentUrl = env('JAZZ_POSTURL');
-
-    //         // if (empty($merchantId) || empty($password) || empty($hashKey)) {
-    //         //     throw new \Exception('JazzCash credentials not configured');
-    //         // }
-    //         $Amount = $request->input('amount');
-   
-    //         //API Params from env
-    //          $MerchantID  = env('JAZZ_MERCHANT_ID');
-    //          $Password = env('JAZZ_PASSWORD');
-    //          $HashKey = env('JAZZ_HASHKEY');
-    //          $ReturnURL = route('payment.return');
-    //          $PostURL = env('JAZZ_POSTURL'); 
-         
-    //          date_default_timezone_set("Asia/karachi");
-         
-    //          $BillReference = "Fri" . Carbon::now()->format('YmdHis') . mt_rand(10, 100);
-    //          $Description = "Test-TRXN";
-    //          $Language = "EN";
-    //          $TxnCurrency = "PKR";
-    //          $TxnDateTime = Carbon::now('Asia/Karachi')->format('YmdHis');
-    //          $TxnExpiryDateTime = Carbon::now('Asia/Karachi')->addDays(3)->format('YmdHis');
-    //          $TxnRefNumber = $BillReference;
-    //          $TxnType = "MPAY"; 
-    //          $Version = '1.1';
-         
-    //         //optional fields
-    //          $SubMerchantID = "";
-    //          $BankID = "";
-    //          $ProductID = "";
-    //          $ppmpf_1 = "";
-    //          $ppmpf_2 = "";
-    //          $ppmpf_3 = "";
-    //          $ppmpf_4 = "";
-    //          $ppmpf_5 = "";
-         
-    //          // Hash Generation
-    //          $HashArray = [
-    //              $Amount, $BankID, $BillReference, $Description, $Language, $MerchantID,
-    //              $Password, $ProductID, $ReturnURL, $TxnCurrency, $TxnDateTime, $TxnExpiryDateTime,
-    //              $TxnRefNumber, $TxnType, $Version, $ppmpf_1, $ppmpf_2, $ppmpf_3, $ppmpf_4,
-    //              $ppmpf_5
-    //          ];
-         
-    //          $SortedArray = $HashKey;
-    //          foreach ($HashArray as $value) {
-    //              if (!empty($value)) {
-    //                  $SortedArray .= "&" . $value;
-    //              }
-    //          }
-         
-    //          $Securehash = hash_hmac('sha256', $SortedArray, $HashKey);
-         
-    //          // Data to be posted from the form
-    //          $params = [
-    //              'pp_Version' => $Version,
-    //              'pp_TxnType' => $TxnType,
-    //              'pp_Language' => $Language,
-    //              'pp_MerchantID' => $MerchantID,
-    //              'pp_SubMerchantID' => $SubMerchantID,
-    //              'pp_Password' => $Password,
-    //              'pp_TxnRefNo' => $TxnRefNumber,
-    //              'pp_Amount' => $Amount,
-    //              'pp_DiscountedAmount' => '',  
-    //              'pp_DiscountBank' => '',  
-    //              'pp_TxnCurrency' => $TxnCurrency,
-    //              'pp_TxnDateTime' => $TxnDateTime,
-    //              'pp_TxnExpiryDateTime' => $TxnExpiryDateTime,
-    //              'pp_BillReference' => $BillReference,
-    //              'pp_Description' => $Description,
-    //              'pp_ReturnURL' => $ReturnURL,
-    //              'pp_SecureHash' => $Securehash,
-    //              'ppmpf_1' => $ppmpf_1,
-    //              'ppmpf_2' => $ppmpf_2,
-    //              'ppmpf_3' => $ppmpf_3,
-    //              'ppmpf_4' => $ppmpf_4,
-    //              'ppmpf_5' => $ppmpf_5,
-    //              'PostURL' =>$PostURL
-    //          ];
-             
-           
-    //         // $params = [
-    //         //     'pp_Version' => '1.1',
-    //         //     'pp_TxnType' => 'MWALLET',
-    //         //     'pp_Language' => 'EN',
-    //         //     'pp_MerchantID' => $merchantId,
-    //         //     'pp_Password' => $password,
-    //         //     'pp_ReturnURL' => $payment->return_url,
-    //         //     'pp_Amount' => $validated['amount'] * 100,
-    //         //     'pp_TxnRefNo' => $txnRef,
-    //         //     'pp_Description' => 'Product Purchase',
-    //         //     'pp_BillReference' => 'prod-' . $validated['product_id'],
-    //         //     'pp_TxnCurrency' => 'PKR',
-    //         //     'pp_TxnDateTime' => now()->format('YmdHis'),
-    //         //     'pp_TxnExpiryDateTime' => now()->addMinutes(30)->format('YmdHis'),
-    //         //     'pp_SecureHash' => '',
-    //         // ];
-
-    //         // Generate Secure Hash
-    //         // ksort($params);
-    //         // $params['pp_SecureHash'] = hash_hmac('sha256', implode('&', $params), $hashKey);
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'payment_url' => $PostURL . '?' . http_build_query($params),
-    //           //  'course_id' =>  $course->id ,
-    //             'payment_id' => $payment->id,
-    //             'txn_ref' => $txnRef
-    //         ]);
-
-    //     } catch (\Exception $e) {
-    //         Log::error('Payment Initiation Error: ' . $e->getMessage());
-    //         return response()->json([
-    //             'success' => false,
-    //             'error' => 'Payment processing failed',
-    //             'message' => $e->getMessage(),
-    //             'trace' => env('APP_DEBUG') ? $e->getTraceAsString() : null
-    //         ], 500);
-    //     }
-    // }
     public function initiatePayment(Request $request)
     {
-        try {
-            // Validate input
-            $validated = $request->validate([
-                'product_id' => 'required|integer',
-              'price' => 'nullable|numeric',  // Changed to price to match DB
-            'amount' => 'nullable|numeric',
-                'source_site_url' => 'required|url',
-                'duration' => 'required|string',
-                'email' => 'required|email',
-                'name' => 'required|string',
-            ]);
+        $validated = $request->validate([
+            'product_id' => 'required|integer',
+            'amount' => 'required|numeric|min:1',
+            'email' => 'required|email',
+            'name' => 'required|string|max:255',
+        ]);
     
-            // Create or update course
-            $course = Course::updateOrCreate(
-                ['plan_id' => $validated['product_id']],
-                [
-                    'course_name' => 'Product ' . $validated['product_id'],
-                    'description' => 'Payment for product ' . $validated['product_id'],
-                    'type' => 1,
-                    'source_site' => $validated['source_site_url'],
-                    'advisor' => 'System',
-                    'level' => 'Beginner',
-                    'duration' => $validated['duration'],
-                ]
-            );
+        // Generate unique transaction references
+        $txnRefNo = 'TXN' . time() . rand(1000, 9999);
+        $billRef = 'BILL' . time() . rand(1000, 9999);
+        $txnDateTime = now()->format('YmdHis');
+        $txnExpiryDateTime = now()->addDays(1)->format('YmdHis');
     
-            // Create registration
-            $registration = Registration::create([
-                'email' => $validated['email'],
-                'name' => $validated['name'],
-                'payment_method' => 'card',
-                'status' => 'incomplete',
-                'amount' => $validated['amount'], // Store amount in registration
-            ]);
+        // Prepare parameters
+        $params = [
+            'pp_Version' => '1.1',
+            'pp_TxnType' => 'MPAY',
+            'pp_Language' => 'EN',
+            'pp_MerchantID' => env('JAZZ_MERCHANT_ID'),
+            'pp_Password' => env('JAZZ_PASSWORD'),
+            'pp_TxnRefNo' => $txnRefNo,
+            'pp_Amount' => $validated['amount'] * 100, // Convert to paisa
+            'pp_TxnCurrency' => 'PKR',
+            'pp_TxnDateTime' => $txnDateTime,
+            'pp_BillReference' => $billRef,
+            'pp_Description' => 'Payment for Product ' . $validated['product_id'],
+            'pp_ReturnURL' => route('jazzcash.callback'),
+            'pp_TxnExpiryDateTime' => $txnExpiryDateTime,
+        ];
     
-            // Generate transaction reference
-            $txnRef = 'TXN' . $validated['product_id'] . time();
+        // Generate secure hash (MUST be in correct order)
+        $hashData = [
+            $params['pp_Version'],
+            $params['pp_TxnType'],
+            $params['pp_Language'],
+            $params['pp_MerchantID'],
+            $params['pp_Password'],
+            $params['pp_TxnRefNo'],
+            $params['pp_Amount'],
+            $params['pp_TxnCurrency'],
+            $params['pp_TxnDateTime'],
+            $params['pp_BillReference'],
+            $params['pp_Description'],
+            $params['pp_ReturnURL'],
+            $params['pp_TxnExpiryDateTime'],
+        ];
     
-            // Create payment record
-            $payment = PackagePayment::create([
-                'transaction_id' => $txnRef,
-                'product_id' => $validated['product_id'],
-                'amount' => $validated['amount'],
-                'status' => 'pending',
-                'return_url' => url('/jazzcash/callback?source=' . urlencode($validated['source_site_url'])),
-                'jazzcash_response' => null,
-            ]);
+        $sortedString = implode('&', array_filter($hashData));
+        $secureHash = hash_hmac('sha256', $sortedString, env('JAZZ_HASHKEY'));
+        $params['pp_SecureHash'] = $secureHash;
     
-            $MerchantID  = env('JAZZ_MERCHANT_ID');
-            $Password = env('JAZZ_PASSWORD');
-            $HashKey = env('JAZZ_HASHKEY');
-            $ReturnURL = route('payment.return');
-            $PostURL = env('JAZZ_POSTURL'); 
-        
-            date_default_timezone_set("Asia/karachi");
-        
-            $BillReference = "Fri" . Carbon::now()->format('YmdHis') . mt_rand(10, 100);
-            $Description = "Payment for Product " . $validated['product_id'];
-            $Language = "EN";
-            $TxnCurrency = "PKR";
-            $TxnDateTime = Carbon::now('Asia/Karachi')->format('YmdHis');
-            $TxnExpiryDateTime = Carbon::now('Asia/Karachi')->addDays(3)->format('YmdHis');
-            $TxnRefNumber = $BillReference;
-            $TxnType = "MPAY"; 
-            $Version = '1.1';
-        
-            //optional fields
-            $SubMerchantID = "";
-            $BankID = "";
-            $ProductID = "";
-            $ppmpf_1 = "";
-            $ppmpf_2 = "";
-            $ppmpf_3 = "";
-            $ppmpf_4 = "";
-            $ppmpf_5 = "";
-        
-            // Use the validated amount here
-            $amount = ($validated['amount'] ?? $validated['price'] ?? 0) * 100;
-        
-            // Hash Generation
-            $HashArray = [
-                $amount, $BankID, $BillReference, $Description, $Language, $MerchantID,
-                $Password, $ProductID, $ReturnURL, $TxnCurrency, $TxnDateTime, $TxnExpiryDateTime,
-                $TxnRefNumber, $TxnType, $Version, $ppmpf_1, $ppmpf_2, $ppmpf_3, $ppmpf_4,
-                $ppmpf_5
-            ];
+        // Store transaction in database before redirecting
+        $transaction = Transaction::create([
+            'txn_ref_no' => $txnRefNo,
+            'bill_ref' => $billRef,
+            'amount' => $validated['amount'],
+            'status' => 'pending',
+            'user_email' => $validated['email'],
+            'product_id' => $validated['product_id'],
+            'request_data' => json_encode($params),
+        ]);
     
-            $SortedArray = $HashKey;
-            foreach ($HashArray as $value) {
-                if (!empty($value)) {
-                    $SortedArray .= "&" . $value;
-                }
-            }
-    
-            $Securehash = hash_hmac('sha256', $SortedArray, $HashKey);
-    
-            $params = [
-                'pp_Version' => $Version,
-                'pp_TxnType' => $TxnType,
-                'pp_Language' => $Language,
-                'pp_MerchantID' => $MerchantID,
-                'pp_SubMerchantID' => $SubMerchantID,
-                'pp_Password' => $Password,
-                'pp_TxnRefNo' => $TxnRefNumber,
-                'pp_Amount' => $amount,  // Using the validated amount here
-                'pp_DiscountedAmount' => '',  
-                'pp_DiscountBank' => '',  
-                'pp_TxnCurrency' => $TxnCurrency,
-                'pp_TxnDateTime' => $TxnDateTime,
-                'pp_TxnExpiryDateTime' => $TxnExpiryDateTime,
-                'pp_BillReference' => $BillReference,
-                'pp_Description' => $Description,
-                'pp_ReturnURL' => $ReturnURL,
-                'pp_SecureHash' => $Securehash,
-                'ppmpf_1' => $ppmpf_1,
-                'ppmpf_2' => $ppmpf_2,
-                'ppmpf_3' => $ppmpf_3,
-                'ppmpf_4' => $ppmpf_4,
-                'ppmpf_5' => $ppmpf_5,
-                'PostURL' => $PostURL
-            ];
-    
-            return response()->json([
-                'success' => true,
-                'payment_url' => $PostURL . '?' . http_build_query($params),
-                'payment_id' => $payment->id,
-                'txn_ref' => $txnRef,
-                'registration_id' => $registration->id
-            ]);
-    
-        } catch (\Exception $e) {
-            Log::error('Payment Initiation Error: ' . $e->getMessage());
-            return response()->json([
-                'success' => false,
-                'error' => 'Payment processing failed',
-                'message' => $e->getMessage(),
-                'trace' => env('APP_DEBUG') ? $e->getTraceAsString() : null
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'payment_url' => env('JAZZ_POSTURL'),
+            'params' => $params,
+            'txn_ref' => $txnRefNo
+        ]);
     }
     public function paymentCallback(Request $request)
     {

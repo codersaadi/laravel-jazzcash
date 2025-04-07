@@ -181,6 +181,11 @@
 document.getElementById('checkout-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    // Show loading indicator
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
     const formData = {
         name: document.getElementById('fname').value,
         email: document.getElementById('email').value,
@@ -199,33 +204,46 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
         },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
-            // Create a form dynamically to submit to JazzCash
+            // Create a hidden form to submit to JazzCash
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = data.payment_url;
-            
+            form.style.display = 'none';
+
             // Add all parameters as hidden inputs
-            for (const key in data.params) {
+            Object.keys(data.params).forEach(key => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = key;
                 input.value = data.params[key];
                 form.appendChild(input);
-            }
-            
+            });
+
             document.body.appendChild(form);
             form.submit();
         } else {
-            console.error('Error:', data);
-            alert(data.message || 'Payment initiation failed');
+            throw new Error(data.message || 'Payment initiation failed');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        // Show error message to user
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.textContent = 'Error: ' + error.message;
+        e.target.appendChild(errorDiv);
+        
+        // Reset button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
     });
 });
 </script>
