@@ -211,6 +211,8 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
         return response.json();
     })
     .then(data => {
+        console.log('API Response:', data); // Add this line
+
         if (data.success) {
             // Create a hidden form to submit to JazzCash
             const form = document.createElement('form');
