@@ -195,14 +195,13 @@ Route::post('/payment/inquire',[JazzController::class,'status_inquire'])->name('
 Route::get('/admin/badgereport', [BadgeReportController::class, 'index'])->name('badge.index');
 Route::get('/admin/badgereport/filter', [BadgeReportController::class, 'filterRegistrations'])->name('registrations.filter');
 Route::get('admin/badgereport/download-CSV',[BadgeReportController::class,'makeCSV'])->name('badgereport_csv');
-///////////////////////////////newadd route
 
+// Remove the API middleware from these routes
 Route::post('/jazzcash/initiate', [JazzController::class, 'initiatePayment'])
-    ->name('jazzcash.initiate')
-    ->middleware('api'); // Use API middleware if needed
+    ->name('jazzcash.initiate');
 
 Route::post('/jazzcash/callback', [JazzController::class, 'paymentCallback'])
     ->name('jazzcash.callback');
-    // Route::get('/redirect-to-jazzcash', [PaymentController::class, 'redirectToJazzCash']);
+
   
     Route::post('/admin/registration/add/new',[RegistrationController::class, 'addnewRegistration'])->name('save.newregistration');

@@ -188,11 +188,9 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
         amount: document.querySelector('input[name="amount"]').value,
         source_site_url: document.querySelector('input[name="source_site_url"]').value,
         duration: document.querySelector('input[name="duration"]').value,
-        // Include both amount and price for compatibility
-        price: document.querySelector('input[name="amount"]').value
     };
 
-    fetch("{{ route('save.newregistration') }}", {
+    fetch("{{ route('jazzcash.initiate') }}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -204,10 +202,25 @@ document.getElementById('checkout-form').addEventListener('submit', function(e) 
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            window.location.href = data.redirect_url;
+            // Create a form dynamically to submit to JazzCash
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = data.payment_url;
+            
+            // Add all parameters as hidden inputs
+            for (const key in data.params) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = data.params[key];
+                form.appendChild(input);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
         } else {
             console.error('Error:', data);
-            alert(data.message || 'Registration failed');
+            alert(data.message || 'Payment initiation failed');
         }
     })
     .catch(error => {
