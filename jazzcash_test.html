@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JazzCash Direct Form Test</title>
+</head>
+<body>
+    <h1>JazzCash Direct Form Test</h1>
+    
+    <!-- Simple form that posts directly to JazzCash -->
+    <form method="POST" action="https://payments.jazzcash.com.pk/CustomerPortal/transactionmanagement/merchantform">
+        <!-- Required Parameters -->
+        <input type="hidden" name="pp_Version" value="1.1">
+        <input type="hidden" name="pp_TxnType" value="MPAY">
+        <input type="hidden" name="pp_Language" value="EN">
+        <input type="hidden" name="pp_MerchantID" value="69698746">
+        <input type="hidden" name="pp_Password" value="6yv6b0f75w">
+        <input type="hidden" name="pp_TxnRefNo" value="TXN<?= time() ?>">
+        <input type="hidden" name="pp_Amount" value="10000"> <!-- 100 PKR in paisa -->
+        <input type="hidden" name="pp_TxnCurrency" value="PKR">
+        <input type="hidden" name="pp_TxnDateTime" value="<?= date('YmdHis') ?>">
+        <input type="hidden" name="pp_BillReference" value="BILL<?= time() ?>">
+        <input type="hidden" name="pp_Description" value="Test Payment">
+        <input type="hidden" name="pp_ReturnURL" value="https://yourdomain.com/jazzcash/callback">
+        <input type="hidden" name="pp_TxnExpiryDateTime" value="<?= date('YmdHis', strtotime('+1 day')) ?>">
+        
+        <!-- Secure Hash -->
+        <input type="hidden" name="pp_SecureHash" value="<?= 
+            hash_hmac('sha256', 
+                '1.1&MPAY&EN&69698746&6yv6b0f75w&TXN'.time().'&10000&PKR&'.date('YmdHis').'&BILL'.time().'&Test Payment&https://yourdomain.com/jazzcash/callback&'.date('YmdHis', strtotime('+1 day')), 
+                '4z05gy8az2'
+            ) 
+        ?>">
+        
+        <button type="submit">Test Pay with JazzCash</button>
+    </form>
+
+    <h2>Instructions</h2>
+    <ol>
+        <li>Click the payment button</li>
+        <li>You should be immediately redirected to JazzCash</li>
+        <li>If not, check browser console for errors</li>
+        <li>If it redirects but fails, JazzCash will show an error message</li>
+    </ol>
+</body>
+</html>
+
+
+<!-- 
+How to Use This Test
+Upload this file to your server's public directory
+
+Access it directly via: https://yourdomain.com/jazzcash_test.html
+
+Click the payment button
+
+Expected Outcomes
+If it works:
+You'll be redirected to JazzCash payment page
+
+This confirms your credentials and parameters are correct
+
+The issue is in your JavaScript/Laravel implementation
+
+If it doesn't work:
+No redirect at all:
+
+Check browser console for errors
+
+Verify your server isn't blocking POST requests to JazzCash
+
+Try different browser/device
+
+JazzCash shows an error:
+
+Note the exact error message
+
+Common issues:
+
+Invalid hash (double-check hash calculation)
+
+Expired timestamp (ensure server time is correct)
+
+Invalid merchant credentials
+
+Next Steps Based on Results
+If test form works:
+Compare the working parameters with your Laravel implementation
+
+Focus on these areas:
+
+JavaScript form submission code
+
+AJAX response handling
+
+Dynamic parameter generation
+
+If test form fails:
+Verify your JazzCash credentials are correct
+
+Check with JazzCash support about:
+
+Merchant account status
+
+IP whitelisting requirements
+
+Any special configuration needed -->
+
+
+<!-- For the most common issue (hash mismatch), ensure your hash string is in EXACTLY this order:
+
+$hashData = [
+    $params['pp_Version'],
+    $params['pp_TxnType'],
+    $params['pp_Language'],
+    $params['pp_MerchantID'],
+    $params['pp_Password'],
+    $params['pp_TxnRefNo'],
+    $params['pp_Amount'],
+    $params['pp_TxnCurrency'],
+    $params['pp_TxnDateTime'],
+    $params['pp_BillReference'],
+    $params['pp_Description'],
+    $params['pp_ReturnURL'],
+    $params['pp_TxnExpiryDateTime'],
+]; -->
